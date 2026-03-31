@@ -7,9 +7,11 @@
 			content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
 		/>
 		<title>Scramjet</title>
-
 		<link rel="shortcut icon" content="favicon.webp" />
-	
+
+		<link rel="preload" href="/scram/scramjet.wasm.wasm" as="fetch" crossorigin="anonymous" />
+		<link rel="preload" href="/libcurl/index.wasm" as="fetch" crossorigin="anonymous" />
+
 		<script src="/scram/scramjet.all.js"></script>
 		<script src="/baremux/index.js"></script>
 		
@@ -18,7 +20,6 @@
 		<script src="search.js" defer></script>
 		<script src="index.js" defer></script>
 	</head>
-
 	<body>
 		<div title="Scramjet Logo" class="flex-center logo-wrapper header-center">
 			<img class="logo" src="sj.png" alt="Scramjet" />
@@ -31,7 +32,6 @@
 				innovate web proxy technologies.
 			</p>
 		</div>
-
 		<form id="sj-form" class="flex-center">
 			<input
 				id="sj-search-engine"
@@ -46,12 +46,12 @@
 		</div>
 		<footer>
 			<div>
-				<a
+				
 					title="The Mercury Workshop GitHub organization"
 					href="https://github.com/MercuryWorkshop"
 					>Mercury Workshop</a
 				>
-				<a
+				
 					title="The example demo app for Scramjet"
 					href="https://github.com/MercuryWorkshop/Scramjet-Demo"
 					>GitHub</a
