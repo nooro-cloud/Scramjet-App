@@ -1,27 +1,12 @@
 "use strict";
-/**
- * @type {HTMLFormElement}
- */
+
 const form = document.getElementById("sj-form");
-/**
- * @type {HTMLInputElement}
- */
 const address = document.getElementById("sj-address");
-/**
- * @type {HTMLInputElement}
- */
 const searchEngine = document.getElementById("sj-search-engine");
-/**
- * @type {HTMLParagraphElement}
- */
 const error = document.getElementById("sj-error");
-/**
- * @type {HTMLPreElement}
- */
 const errorCode = document.getElementById("sj-error-code");
 
 const { ScramjetController } = $scramjetLoadController();
-
 const scramjet = new ScramjetController({
 	files: {
 		wasm: "/scram/scramjet.wasm.wasm",
@@ -29,14 +14,20 @@ const scramjet = new ScramjetController({
 		sync: "/scram/scramjet.sync.js",
 	},
 });
-
 scramjet.init();
 
 const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
 
+// Preload WASM before anything tries to use it
+async function preloadWasm() {
+	try {
+		await fetch("/libcurl/index.wasm");
+	} catch(e) {}
+}
+preloadWasm();
+
 form.addEventListener("submit", async (event) => {
 	event.preventDefault();
-
 	try {
 		await registerSW();
 	} catch (err) {
@@ -46,17 +37,22 @@ form.addEventListener("submit", async (event) => {
 	}
 
 	const url = search(address.value, searchEngine.value);
-
 	let wispUrl =
 		(location.protocol === "https:" ? "wss" : "ws") +
 		"://" +
 		location.host +
 		"/wisp/";
+
+	// Wait for WASM to be ready before setting transport
 	if ((await connection.getTransport()) !== "/libcurl/index.mjs") {
 		await connection.setTransport("/libcurl/index.mjs", [
 			{ websocket: wispUrl },
 		]);
 	}
+
+	// Small delay to ensure WASM is fully initialized
+	await new Promise(resolve => setTimeout(resolve, 500));
+
 	const frame = scramjet.createFrame();
 	frame.frame.id = "sj-frame";
 	document.body.appendChild(frame.frame);
